@@ -1,0 +1,16 @@
+body {
+  background-color: #f5f7fb;
+}
+
+.navbar-brand {
+  font-weight: 600;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.landing-illustration {
+  min-height: 220px;
+}
+
