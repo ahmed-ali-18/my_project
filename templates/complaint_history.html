@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Complaint History{% endblock %}
+{% block content %}
+<h2 class="mb-4">Complaint History</h2>
+{% if complaints %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+      <tr>
+        <th>Title</th>
+        <th>Area</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Resolved</th>
+        <th>Flagged</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for c in complaints %}
+        <tr>
+          <td>{{ c.title }}</td>
+          <td>{{ c.area }}</td>
+          <td>{{ c.category or 'Uncategorized' }}</td>
+          <td>
+            <span class="badge bg-{% if c.status == 'resolved' %}success{% elif c.status == 'in_progress' %}info{% else %}warning{% endif %}">
+              {{ c.status.replace('_', ' ').title() }}
+            </span>
+          </td>
+          <td>{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+          <td>{{ c.resolved_at.strftime('%Y-%m-%d') if c.resolved_at else '-' }}</td>
+          <td>
+            {% if c.flagged %}
+              <span class="badge bg-danger">Delayed</span>
+            {% else %}
+              <span class="badge bg-secondary">On time</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="text-muted">No complaints found.</p>
+{% endif %}
+{% endblock %}
+

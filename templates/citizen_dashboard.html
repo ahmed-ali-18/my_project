@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Citizen Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-4">My Complaints</h2>
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card text-bg-primary mb-3">
+      <div class="card-body">
+        <h6 class="card-title">Total</h6>
+        <p class="card-text fs-3">{{ total }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-warning mb-3">
+      <div class="card-body">
+        <h6 class="card-title">Pending</h6>
+        <p class="card-text fs-3">{{ pending }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-success mb-3">
+      <div class="card-body">
+        <h6 class="card-title">Resolved</h6>
+        <p class="card-text fs-3">{{ resolved }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-bg-danger mb-3">
+      <div class="card-body">
+        <h6 class="card-title">Delayed</h6>
+        <p class="card-text fs-3">{{ delayed }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mb-3">
+  <a href="{{ url_for('complaints.new_complaint') }}" class="btn btn-primary me-2">Submit New Complaint</a>
+  <a href="{{ url_for('complaints.complaint_history') }}" class="btn btn-outline-secondary">View History</a>
+</div>
+
+{% if complaints %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+      <tr>
+        <th>Title</th>
+        <th>Area</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Flagged</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for c in complaints %}
+        <tr>
+          <td>{{ c.title }}</td>
+          <td>{{ c.area }}</td>
+          <td>{{ c.category or 'Uncategorized' }}</td>
+          <td>
+            <span class="badge bg-{% if c.status == 'resolved' %}success{% elif c.status == 'in_progress' %}info{% else %}warning{% endif %}">
+              {{ c.status.replace('_', ' ').title() }}
+            </span>
+          </td>
+          <td>{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+          <td>
+            {% if c.flagged %}
+              <span class="badge bg-danger">Delayed</span>
+            {% else %}
+              <span class="badge bg-secondary">On time</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="text-muted">You have not submitted any complaints yet.</p>
+{% endif %}
+{% endblock %}
+

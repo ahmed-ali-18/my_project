@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Submit Complaint{% endblock %}
+{% block content %}
+<h2 class="mb-4">Submit Complaint</h2>
+<form method="post" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" name="title" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="4" required></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Area / Locality</label>
+    <input type="text" name="area" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Category (optional)</label>
+    <select name="category" class="form-select">
+      <option value="">-- Auto-detect using AI --</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}">{{ cat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-check mb-3">
+    <input class="form-check-input" type="checkbox" name="auto_classify" id="auto_classify" checked>
+    <label class="form-check-label" for="auto_classify">
+      Let AI suggest the best category
+    </label>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Attach Image (optional)</label>
+    <input type="file" name="image" class="form-control" accept="image/png,image/jpeg">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
+

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Complaints Management{% endblock %}
+{% block content %}
+<h2 class="mb-4">Complaints Management</h2>
+
+{% if delayed_count is defined and delayed_count and delayed_count > 0 %}
+<div class="alert alert-warning d-flex align-items-center mb-3" role="alert">
+  <span class="me-3">⚠️</span>
+  <div class="flex-grow-1">
+    <strong>Notification:</strong> {{ delayed_count }} complaint(s) are delayed (not resolved within 2 minutes). Resolve them from the list below or filter by delayed.
+  </div>
+  <a href="{{ url_for('admin.delayed_complaints') }}" class="btn btn-warning btn-sm">View delayed only</a>
+</div>
+{% endif %}
+
+<form class="row g-3 mb-3" method="get">
+  <div class="col-md-3">
+    <label class="form-label">Status</label>
+    <select name="status" class="form-select">
+      <option value="">All</option>
+      <option value="pending" {% if filter_status == 'pending' %}selected{% endif %}>Pending</option>
+      <option value="in_progress" {% if filter_status == 'in_progress' %}selected{% endif %}>In Progress</option>
+      <option value="resolved" {% if filter_status == 'resolved' %}selected{% endif %}>Resolved</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Area</label>
+    <input type="text" name="area" value="{{ filter_area or '' }}" class="form-control" placeholder="Search area">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Category</label>
+    <input type="text" name="category" value="{{ filter_category or '' }}" class="form-control" placeholder="Category">
+  </div>
+  <div class="col-md-3 d-flex align-items-end">
+    <button type="submit" class="btn btn-primary me-2">Filter</button>
+    <a href="{{ url_for('admin.list_complaints') }}" class="btn btn-outline-secondary">Reset</a>
+  </div>
+</form>
+
+{% if complaints %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Citizen</th>
+        <th>Area</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Resolved</th>
+        <th>Flagged</th>
+        <th>Update</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for c in complaints %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.title }}</td>
+          <td>{{ c.user.name if c.user else 'Unknown' }}</td>
+          <td>{{ c.area }}</td>
+          <td>{{ c.category or 'Uncategorized' }}</td>
+          <td>
+            <span class="badge bg-{% if c.status == 'resolved' %}success{% elif c.status == 'in_progress' %}info{% else %}warning{% endif %}">
+              {{ c.status.replace('_', ' ').title() }}
+            </span>
+          </td>
+          <td>{{ c.created_at.strftime('%Y-%m-%d') if c.created_at else '-' }}</td>
+          <td>{{ c.resolved_at.strftime('%Y-%m-%d') if c.resolved_at else '-' }}</td>
+          <td>
+            {% if c.flagged %}
+              <span class="badge bg-danger">Delayed</span>
+            {% else %}
+              <span class="badge bg-secondary">On time</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('admin.update_complaint', complaint_id=c.id) }}" class="d-flex">
+              <select name="status" class="form-select form-select-sm me-2">
+                <option value="pending" {% if c.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="in_progress" {% if c.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="resolved" {% if c.status == 'resolved' %}selected{% endif %}>Resolved</option>
+              </select>
+              <button type="submit" class="btn btn-sm btn-primary">Save</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="text-muted">No complaints found for the selected filters.</p>
+{% endif %}
+{% endblock %}
+
